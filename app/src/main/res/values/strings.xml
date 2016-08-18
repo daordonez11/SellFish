@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">SellFish</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="welcome">Bienvenido a Sellfish</string>
+    <string name="menu">Aquí encontrará las herramientas que ofrecemos</string>
+</resources>
