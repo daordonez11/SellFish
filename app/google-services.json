@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "973889940906",
+    "firebase_url": "https://sellfish-1d475.firebaseio.com",
+    "project_id": "sellfish-1d475",
+    "storage_bucket": "sellfish-1d475.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:973889940906:android:8f8d8d05891e7a8f",
+        "android_client_info": {
+          "package_name": "com.l08.sellfish"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "973889940906-dsqo10bm1niptg95kjb9pcdje68mvntg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.l08.sellfish",
+            "certificate_hash": "6F14D8999A414033FB55D5B738A7FC220027D80F"
+          }
+        },
+        {
+          "client_id": "973889940906-dpoqis2i04bs95pur04um4v9fc7996qe.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7349uBXBr8YB6osI148bEPvMxedcP5v0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "973889940906-dpoqis2i04bs95pur04um4v9fc7996qe.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
