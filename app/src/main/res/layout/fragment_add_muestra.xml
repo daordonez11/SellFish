@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:gravity="center_horizontal" android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Semana:"
+            android:id="@+id/textView6"
+            android:layout_margin="5dp" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:ems="10"
+            android:id="@+id/editTextSemana" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Nuevo Pez"
+        android:id="@+id/textView7"
+        android:layout_gravity="center_horizontal" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="5dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Longitud: "
+            android:id="@+id/fishNumber" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:ems="10"
+            android:id="@+id/fishLength"
+            android:layout_weight="1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="cm"
+            android:id="@+id/textView9" />
+        <Button
+            android:id="@+id/btnSetPhoto"
+            android:layout_width="wrap_content"
+            android:drawableRight="@drawable/ic_photo_camera_black_48dp"
+            android:layout_height="wrap_content"
+            android:textAllCaps="false"
+            android:text="@string/add_photo"
+            android:layout_margin="5dp"
+            android:padding="5dp"
+            android:textColor="@color/white"
+            android:background="#607D8B"/>
+    </LinearLayout>
+    <ImageView
+        android:id="@+id/fishIV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/btnAgregarMuestra"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAllCaps="false"
+        android:text="@string/guardar"
+        android:layout_margin="5dp"
+        android:textColor="@color/colorAccent"
+        android:background="@color/colorPrimaryDark"/>
+    <Button
+        android:id="@+id/btnCancelarDialogo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAllCaps="false"
+        android:text="@string/cancelar"
+        android:layout_margin="5dp"
+        android:textColor="@color/white"
+        android:background="@color/redButton"/>
+</LinearLayout>

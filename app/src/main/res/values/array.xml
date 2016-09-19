@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="especies_array">
+        <item>Mojarra</item>
+        <item>Cachama</item>
+        <item>Tilapia</item>
+        <item>Bagre</item>
+        <item>Sierra</item>
+        <item>Curito</item>
+        <item>Carpa</item>
+        <item>Esturión</item>
+        <item>Salmón</item>
+        <item>Trucha</item>
+    </string-array>
+</resources>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Pez n:"
+        android:id="@+id/fishNumber" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:ems="10"
+        android:id="@+id/fishLength"
+        android:layout_weight="1" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="cm"
+        android:id="@+id/textView9" />
+    <Button
+        android:id="@+id/btnSetPhoto"
+        android:layout_width="wrap_content"
+        android:drawableRight="@drawable/ic_photo_camera_black_48dp"
+        android:layout_height="wrap_content"
+        android:textAllCaps="false"
+        android:text="@string/add_photo"
+        android:layout_margin="5dp"
+        android:padding="5dp"
+        android:textColor="@color/white"
+        android:background="#607D8B"/>
+</LinearLayout>
