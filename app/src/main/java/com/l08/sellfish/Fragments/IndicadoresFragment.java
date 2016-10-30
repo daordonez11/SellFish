@@ -2,6 +2,7 @@ package com.l08.sellfish.Fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -27,6 +29,7 @@ import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -210,6 +213,9 @@ private LineData lineData;
         }
         //Cargo en un data set
         LineDataSet dataSet = new LineDataSet(entries, "Población "+poblacionId);
+        Random rnd = new Random();
+        int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
+        dataSet.setColor(color);
         lineData.addDataSet(dataSet);
         double b = simpleRegression.getSlope();
         double a = simpleRegression.getIntercept();
@@ -245,7 +251,12 @@ System.out.println("Mira el A: "+a+", Mira el B: "+b);
         contador++;
                 if(contador==totalPob)
                 {
+
                     lcEstimado.setData(lineData);
+                    lcEstimado.notifyDataSetChanged();
+                    lcEstimado.getLegend().setWordWrapEnabled(true);
+                    lcEstimado.getLegend().setEnabled(true);
+                    lcEstimado.getLegend().setPosition(Legend.LegendPosition.LEFT_OF_CHART_CENTER) ;
                     lcEstimado.invalidate();
                     tvEstimate.setText(total);
                 }
