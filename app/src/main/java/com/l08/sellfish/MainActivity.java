@@ -6,11 +6,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -20,8 +22,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.l08.sellfish.Activities.LoginActivity;
 import com.l08.sellfish.Activities.MuestrasActivity;
 import com.l08.sellfish.Fragments.AddMuestraDialogFragment;
 import com.l08.sellfish.Fragments.AddPopulationFragment;
@@ -33,8 +41,13 @@ import com.l08.sellfish.Persistance.PoblacionDatabaseHelper;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, AddPopulationFragment.OnFragmentInteractionListener , PoblacionFragment.OnListFragmentInteractionListener, IndicadoresFragment.OnFragmentInteractionListener{
+        implements NavigationView.OnNavigationItemSelectedListener, AddPopulationFragment.OnFragmentInteractionListener , PoblacionFragment.OnListFragmentInteractionListener, IndicadoresFragment.OnFragmentInteractionListener, View.OnClickListener {
+    private static final String TAG = "MainTAG";
     PoblacionDatabaseHelper pbh;
+    Button btnSignOut;
+
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +71,27 @@ public class MainActivity extends AppCompatActivity
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.add_name);
         pbh = PoblacionDatabaseHelper.getInstance(getApplicationContext());
+        btnSignOut = (Button) findViewById(R.id.nav_signout);
+        btnSignOut.setOnClickListener(this);
+        mAuth = FirebaseAuth.getInstance();
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+
+                } else {
+                    // User is signed out
+                    Log.d(TAG, "onAuthStateChanged:signed_out");
+                    Intent mIntent = new Intent(MainActivity.this,LoginActivity.class);
+                    finishAffinity();
+                    startActivity(mIntent);
+                }
+                // ...
+            }
+        };
 //        pbh.deleteAll();
 //        Poblacion dummy = new Poblacion();
 //        dummy.tamaño=3;
@@ -65,11 +99,26 @@ public class MainActivity extends AppCompatActivity
 //        dummy.estanque="Estanque 1";
 //        dummy.especie="otrico";
 //        pbh.addPoblacion(dummy);
-        List<Poblacion> poblaciones = pbh.getAllPopulations();
-        for (Poblacion poblacion : poblaciones) {
-            // do something
-            System.out.println(poblacion.id+"-"+poblacion.especie);
+        // Write a message to the database
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user!=null)
+        {
+        //DatabaseReference myRef = database.getReference(user.getUid()+"/poblaciones");
+        //myRef.setValue("Hello, World!");
+//            List<Poblacion> poblaciones = pbh.getAllPopulations();
+//            for (Poblacion poblacion : poblaciones) {
+                // do something
+//                myRef.setValue(poblacion);
+                //System.out.println(poblacion.id+"-"+poblacion.especie);
+//            }
+
+        }else{
+            Intent mIntent = new Intent(MainActivity.this,LoginActivity.class);
+            finishAffinity();
+            startActivity(mIntent);
         }
+
     }
 
     @Override
@@ -198,6 +247,27 @@ public class MainActivity extends AppCompatActivity
         if(action.equals("MUESTRA")) {
             AddMuestraDialogFragment d = AddMuestraDialogFragment.newInstance(item.id,item.tamaño);
             d.show(getFragmentManager(),"Dialogo");
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+    }
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v.getId()==R.id.nav_signout)
+        {
+            mAuth.signOut();
         }
     }
 }

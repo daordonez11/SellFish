@@ -5,9 +5,21 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.l08.sellfish.Models.Pez;
+import com.l08.sellfish.Models.PezCloud;
 import com.l08.sellfish.Models.Poblacion;
 
 import java.util.ArrayList;
@@ -19,7 +31,7 @@ import java.util.List;
 public class PoblacionDatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "DATABASELOG";
     private static PoblacionDatabaseHelper sInstance;
-
+    private StorageReference mStorageRef;
     // Database Info
     private static final String DATABASE_NAME = "poblacionDatabase";
     private static final int DATABASE_VERSION = 2;
@@ -44,6 +56,8 @@ public class PoblacionDatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_PEZ_SEMANA = "semana";
     private static final String KEY_PEZ_IMAGE = "picture";
     private static final String KEY_POBLACION_PEZ_ID_FK = "poblacionId";
+    private FirebaseUser user;
+    private FirebaseDatabase database;
 
 
     // Called when the database connection is being configured.
@@ -109,6 +123,9 @@ public class PoblacionDatabaseHelper extends SQLiteOpenHelper {
      */
     private PoblacionDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        mStorageRef = FirebaseStorage.getInstance().getReference();
+        database = FirebaseDatabase.getInstance();
+        user = FirebaseAuth.getInstance().getCurrentUser();
     }
 
     /**
@@ -153,7 +170,7 @@ public class PoblacionDatabaseHelper extends SQLiteOpenHelper {
         return poblacion;
     }
     // Insert a fish into the database
-    public void addPez(Pez pez, long poblacionId) {
+    public void addPez(final Pez pez, long poblacionId) {
         Log.d(TAG, "LOOK AT THIS: --->"+pez.imagen+pez.longitud+pez.semana);
 
         // Create and/or open the database for writing
@@ -172,9 +189,37 @@ public class PoblacionDatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_PEZ_SEMANA, pez.semana);
             values.put(KEY_PEZ_WEIGHT, pez.peso);
             // Notice how we haven't specified the primary key. SQLite auto increments the primary key column.
-            db.insertOrThrow(TABLE_PEZ, null, values);
+            final long pezId =db.insertOrThrow(TABLE_PEZ, null, values);
             db.setTransactionSuccessful();
+            pez.id=pezId;
+            StorageReference fishRef = mStorageRef.child("images/"+pezId+".jpg");
+            final long poblacionIdFinal = poblacionId;
+            fishRef.putBytes(pez.imagen)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            // Get a URL to the uploaded content
+                            Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                            PezCloud finalFish = new PezCloud();
+                            finalFish.id=pezId;
+                            finalFish.longitud=pez.longitud;
+                            finalFish.urlImagen=downloadUrl.toString();
+                            finalFish.semana=pez.semana;
+                            finalFish.peso=pez.peso;
+                            DatabaseReference myRef = database.getReference(user.getUid()+"/poblaciones/"+poblacionIdFinal+"/peces/"+pezId);
+                            myRef.setValue(finalFish);
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle unsuccessful uploads
+                            // ...
+                            exception.printStackTrace();
+                        }
+                    });
         } catch (Exception e) {
+            e.printStackTrace();
             Log.d(TAG, "Error while trying to add post to database");
         } finally {
 
@@ -202,9 +247,13 @@ public class PoblacionDatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_POBLACION_TAMAÑO, poblacion.tamaño );
                 poblacionId = db.insertOrThrow(TABLE_POBLACION, null, values);
                 db.setTransactionSuccessful();
-
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            DatabaseReference myRef = database.getReference(user.getUid()+"/poblaciones/"+poblacionId);
+            poblacion.id=poblacionId;
+            myRef.setValue(poblacion);
         } catch (Exception e) {
-            Log.d(TAG, "Error while trying to add or update user");
+            Log.d(TAG, "Error while trying to add or update población");
         } finally {
             db.endTransaction();
         }
@@ -215,6 +264,10 @@ public class PoblacionDatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         db.execSQL("delete from "+TABLE_PEZ+" where "+KEY_POBLACION_PEZ_ID_FK+"=\'"+idPoblacion+"\'");
         db.execSQL("delete from  " + TABLE_POBLACION +" where id=\'" + idPoblacion+"\'" );
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference myRef = database.getReference(user.getUid()+"/poblaciones/"+idPoblacion);
+        myRef.removeValue();
         return idPoblacion;
     }
     public int updatePesoPez(Pez pez) {
