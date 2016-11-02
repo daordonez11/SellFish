@@ -175,7 +175,6 @@ public class AddMuestraDialogFragment extends DialogFragment {
             pecesito.imagen=byteArray;
             Bitmap bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
             fishIV.setImageBitmap(bmp);
-            System.out.println(byteArray);
 
         } else {
             Toast.makeText(getActivity(), "Image Capture Failed", Toast.LENGTH_SHORT)

@@ -39,5 +39,6 @@
         completions."
     </string>
     <string name="sign_out">Signout</string>
+    <string name="title_activity_measure">MeasureActivity</string>
 
 </resources>
