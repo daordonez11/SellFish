@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -92,7 +93,14 @@ public class PoblacionFragment extends Fragment {
                         Log.e("Get Data", pob.estanque);
                         list.add(pob);
                     }
+                    if(list.size()>0)
+                    {
                     recyclerView.setAdapter(new PoblacionRecyclerViewAdapter(list, mListener));
+                    }
+                    else{
+                        Toast t = Toast.makeText(getActivity(), "La lista de poblaciones se encuentra vacia", Toast.LENGTH_SHORT);
+                        t.show();
+                    }
                 }
                 @Override
                 public void onCancelled(DatabaseError firebaseError) {

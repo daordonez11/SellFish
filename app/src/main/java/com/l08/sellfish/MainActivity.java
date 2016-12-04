@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -29,8 +30,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.l08.sellfish.Activities.GesturesActivity;
 import com.l08.sellfish.Activities.LoginActivity;
 import com.l08.sellfish.Activities.MuestrasActivity;
+import com.l08.sellfish.Activities.RecordActivity;
 import com.l08.sellfish.Fragments.AddMuestraDialogFragment;
 import com.l08.sellfish.Fragments.AddPopulationFragment;
 import com.l08.sellfish.Fragments.IndicadoresFragment;
@@ -40,12 +43,14 @@ import com.l08.sellfish.Persistance.PoblacionDatabaseHelper;
 
 import java.util.List;
 
+import static com.l08.sellfish.R.id.fab;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, AddPopulationFragment.OnFragmentInteractionListener , PoblacionFragment.OnListFragmentInteractionListener, IndicadoresFragment.OnFragmentInteractionListener, View.OnClickListener {
     private static final String TAG = "MainTAG";
     PoblacionDatabaseHelper pbh;
     Button btnSignOut;
-
+    com.rey.material.widget.FloatingActionButton fab;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     @Override
@@ -55,6 +60,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -92,6 +98,7 @@ public class MainActivity extends AppCompatActivity
                 // ...
             }
         };
+
 //        pbh.deleteAll();
 //        Poblacion dummy = new Poblacion();
 //        dummy.tamaño=3;
@@ -100,6 +107,14 @@ public class MainActivity extends AppCompatActivity
 //        dummy.especie="otrico";
 //        pbh.addPoblacion(dummy);
         // Write a message to the database
+        fab = (com.rey.material.widget.FloatingActionButton) findViewById(R.id.fabGestures);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivity.this, GesturesActivity.class);
+                startActivityForResult(i,1231);
+            }
+        });
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if(user!=null)
@@ -243,11 +258,69 @@ public class MainActivity extends AppCompatActivity
             i.putExtra("poblacionId",item.id);
             startActivity(i);
         }
+        if(action.equals("GRAB")) {
+//            Dialog d = new Dialog(this);
+//            d.setTitle("Poblacion: " + item.id);
+//            TextView nuevita = new TextView(this);
+//            nuevita.setText(item.especie + "-" + item.estanque);
+//            d.setContentView(nuevita);
+//            d.show();
+            Intent i = new Intent(this, RecordActivity.class);
+            i.putExtra("poblacionId",item.id);
+            startActivity(i);
+        }
 
         if(action.equals("MUESTRA")) {
-            AddMuestraDialogFragment d = AddMuestraDialogFragment.newInstance(item.id,item.tamaño);
+            AddMuestraDialogFragment d = AddMuestraDialogFragment.newInstance(item.id,item.tamaño, 1000);
             d.show(getFragmentManager(),"Dialogo");
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d("ALGUITO","req: "+requestCode+" res:"+resultCode);
+        if(requestCode==1231)
+        {
+            if(resultCode==123)
+            {
+                moveToAgregar();
+            }else if(resultCode==456){
+                moveToPoblaciones();
+            }
+            else if(resultCode==789){
+                moveToIndic();
+            }
+        }
+    }
+
+    private void moveToIndic() {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace( R.id.main_fragment_container, IndicadoresFragment.newInstance("",""), "KPI")
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .commitAllowingStateLoss();
+        final ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(R.string.kpi_name);
+    }
+
+    private void moveToPoblaciones() {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace( R.id.main_fragment_container, PoblacionFragment.newInstance(1), "List")
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .commitAllowingStateLoss();
+        final ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(R.string.list_name);
+    }
+
+    private void moveToAgregar() {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace( R.id.main_fragment_container, AddPopulationFragment.newInstance(""), "Add")
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .commitAllowingStateLoss();
+        final ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(R.string.add_name);
     }
 
     @Override

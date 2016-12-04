@@ -11,6 +11,8 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 
+import com.l08.sellfish.R;
+
 public class InputDialog extends DialogFragment{
 
     @Override

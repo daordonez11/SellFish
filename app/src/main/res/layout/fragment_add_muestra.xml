@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+<ScrollView android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:gravity="center_horizontal" android:layout_width="wrap_content"
@@ -76,6 +80,48 @@
         android:id="@+id/fishIV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp">
+        <FrameLayout
+            android:background="#ffffff"
+            android:id="@+id/camera_preview"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:alpha="1"
+            android:layout_gravity="center"
+            android:layout_weight="1"/>
+        <FrameLayout
+            android:background="@android:color/transparent"
+            android:id="@+id/camera_preview2"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:alpha="1"
+            android:layout_gravity="center"
+            android:layout_weight="1"/>
+
+
+    </RelativeLayout>
+
+
+    <Button
+        android:id="@+id/btnLimpiar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAllCaps="false"
+        android:text="@string/limpiar"
+        android:layout_margin="5dp"
+        android:textColor="#fff"
+        android:background="#43A047"/>
+    <Button
+        android:id="@+id/btnAnalizar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAllCaps="false"
+        android:text="@string/analizar"
+        android:layout_margin="5dp"
+        android:textColor="@color/colorPrimaryDark"
+        android:background="@color/colorAccent"/>
     <Button
         android:id="@+id/btnAgregarMuestra"
         android:layout_width="match_parent"
@@ -95,3 +141,4 @@
         android:textColor="@color/white"
         android:background="@color/redButton"/>
 </LinearLayout>
+</ScrollView>

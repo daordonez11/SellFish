@@ -150,7 +150,7 @@ public class PoblacionDatabaseHelper extends SQLiteOpenHelper {
             if (cursor.moveToFirst()) {
                 do {
                     Poblacion newPoblacion = new Poblacion();
-                    newPoblacion.id= cursor.getLong(cursor.getColumnIndex(KEY_POBLACION_ID));
+                    newPoblacion.id= cursor.getString(cursor.getColumnIndex(KEY_POBLACION_ID));
                     newPoblacion.especie= cursor.getString(cursor.getColumnIndex(KEY_POBLACION_ESPECIE));
                     newPoblacion.estanque= cursor.getString(cursor.getColumnIndex(KEY_POBLACION_ESTANQUE));
                     newPoblacion.periodicidad= cursor.getString(cursor.getColumnIndex(KEY_POBLACION_PERIODICIDAD));
@@ -170,7 +170,7 @@ public class PoblacionDatabaseHelper extends SQLiteOpenHelper {
         return poblacion;
     }
     // Insert a fish into the database
-    public void addPez(final Pez pez, long poblacionId) {
+    public void addPez(final Pez pez, String poblacionId) {
         Log.d(TAG, "LOOK AT THIS: --->"+pez.imagen+pez.longitud+pez.semana);
 
         // Create and/or open the database for writing
@@ -192,32 +192,7 @@ public class PoblacionDatabaseHelper extends SQLiteOpenHelper {
             final long pezId =db.insertOrThrow(TABLE_PEZ, null, values);
             db.setTransactionSuccessful();
             pez.id=pezId;
-            StorageReference fishRef = mStorageRef.child("images/"+pezId+".jpg");
-            final long poblacionIdFinal = poblacionId;
-            fishRef.putBytes(pez.imagen)
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            // Get a URL to the uploaded content
-                            Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                            PezCloud finalFish = new PezCloud();
-                            finalFish.id=pezId;
-                            finalFish.longitud=pez.longitud;
-                            finalFish.urlImagen=downloadUrl.toString();
-                            finalFish.semana=pez.semana;
-                            finalFish.peso=pez.peso;
-                            DatabaseReference myRef = database.getReference(user.getUid()+"/poblaciones/"+poblacionIdFinal+"/peces/"+pezId);
-                            myRef.setValue(finalFish);
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            // Handle unsuccessful uploads
-                            // ...
-                            exception.printStackTrace();
-                        }
-                    });
+
         } catch (Exception e) {
             e.printStackTrace();
             Log.d(TAG, "Error while trying to add post to database");
@@ -250,7 +225,7 @@ public class PoblacionDatabaseHelper extends SQLiteOpenHelper {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             DatabaseReference myRef = database.getReference(user.getUid()+"/poblaciones/"+poblacionId);
-            poblacion.id=poblacionId;
+            poblacion.id=poblacionId+"";
             myRef.setValue(poblacion);
         } catch (Exception e) {
             Log.d(TAG, "Error while trying to add or update población");
@@ -259,30 +234,26 @@ public class PoblacionDatabaseHelper extends SQLiteOpenHelper {
         }
         return poblacionId;
     }
-    public long deletePoblacion(long idPoblacion)
+    public String deletePoblacion(String idPoblacion)
     {
-        SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("delete from "+TABLE_PEZ+" where "+KEY_POBLACION_PEZ_ID_FK+"=\'"+idPoblacion+"\'");
-        db.execSQL("delete from  " + TABLE_POBLACION +" where id=\'" + idPoblacion+"\'" );
+//        SQLiteDatabase db = getWritableDatabase();
+//        db.execSQL("delete from "+TABLE_PEZ+" where "+KEY_POBLACION_PEZ_ID_FK+"=\'"+idPoblacion+"\'");
+//        db.execSQL("delete from  " + TABLE_POBLACION +" where id=\'" + idPoblacion+"\'" );
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference myRef = database.getReference(user.getUid()+"/poblaciones/"+idPoblacion);
         myRef.removeValue();
         return idPoblacion;
     }
-    public int updatePesoPez(Pez pez) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(KEY_PEZ_WEIGHT, pez.peso);
+    public int updatePesoPez(PezCloud pez) {
+        //TODO Falta cambiarlo jojojojojo
 
         // Updating profile picture url for user with that userName
-        return db.update(TABLE_PEZ, values, KEY_PEZ_ID + " = ?",
-                new String[] { String.valueOf(pez.id) });
+        return 1;
     }
 
 
-    public List<Pez> getFishesFromPopulation(long poblacionId) {
+    public List<Pez> getFishesFromPopulation(String poblacionId) {
         List<Pez> poblacion = new ArrayList<>();
 
         // SELECT * FROM POSTS
@@ -313,7 +284,7 @@ public class PoblacionDatabaseHelper extends SQLiteOpenHelper {
             if (cursor.moveToFirst()) {
                 do {
                     Poblacion newPoblacion = new Poblacion();
-                    newPoblacion.id= cursor.getLong(cursor.getColumnIndex(KEY_POBLACION_ID));
+                    newPoblacion.id= cursor.getString(cursor.getColumnIndex(KEY_POBLACION_ID));
                     newPoblacion.especie= cursor.getString(cursor.getColumnIndex(KEY_POBLACION_ESPECIE));
                     newPoblacion.tamaño= cursor.getInt(cursor.getColumnIndex(KEY_POBLACION_TAMAÑO));
 

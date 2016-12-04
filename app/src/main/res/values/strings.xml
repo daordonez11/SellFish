@@ -21,10 +21,10 @@
     <string name="accion">Acción</string>
     <string name="cancelar">Cancelar</string>
     <string name="add_photo">Agregar Foto</string>
-    <string name="title_activity_muestras">MuestrasActivity</string>
+    <string name="title_activity_muestras">Muestras por Población</string>
     <string name="kpi_name">Indicadores</string>
     <string name="send_sms">Enviar SMS</string>
-    <string name="title_activity_login">Sign in</string>
+    <string name="title_activity_login">SellFish</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
@@ -40,5 +40,29 @@
     </string>
     <string name="sign_out">Signout</string>
     <string name="title_activity_measure">MeasureActivity</string>
-
+    <string name="input_hint_units">Output unit</string>
+    <string name="action_cleanStorage">Delete stored photos</string>
+    <string name="input_hint">Reference length and unit</string>
+    <string name="setReferencePoints">Select reference points</string>
+    <string name="setMeasurePoints">Select measurement points</string>
+    <string name="setScaleValue">Enter the reference length and press OK</string>
+    <string name="setPicture">Take a photo</string>
+    <string name="btn_clear">Clear</string>
+    <string name="error_noPoints">Please tap on the screen to select the points</string>
+    <string name="error_noScale">Please enter the scale value</string>
+    <string name="error_numberFormat">Please enter a decimal number</string>
+    <string name="result_lbl">Length: </string>
+    <string name="btn_takePicture">Take Picture</string>
+    <string name="action_choosePhoto">Choose existing photo</string>
+    <string name="storageDeleted">Photos deleted</string>
+    <string name="btn_selectScale">Select scale</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="btn_OK">OK</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="analizar">Analizar</string>
+    <string name="limpiar">Limpiar Lineas</string>
+    <string name="accept">Aceptar</string>
+    <string name="grabaciones">Grabaciones</string>
+    <string name="title_activity_gestures">Acciones por gesto</string>
+    <string name="gestures">Bienvenido usuario, has descubierto nuestro botón mágico para los gestos de la aplicación, intenta utilizar gestos como el doble click para dirigirte a secciones de la aplicación</string>
 </resources>

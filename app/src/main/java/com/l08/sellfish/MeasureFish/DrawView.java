@@ -19,6 +19,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.l08.sellfish.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,10 +71,10 @@ public class DrawView extends SurfaceView {
                 circlePoints.add(new Point(Math.round(event.getX()), Math.round(event.getY())));
                 invalidate();
                 if(circlePoints.size() == 2){
-                    ((TextView) ((Activity)context).findViewById(R.id.info_lbl)).setText(getResources().getString(R.string.setMeasurePoints));
+//                    ((TextView) ((Activity)context).findViewById(R.id.info_lbl)).setText(getResources().getString(R.string.setMeasurePoints));
                 }
                 if(circlePoints.size() == 4){
-                    ((TextView) ((Activity)context).findViewById(R.id.info_lbl)).setText(getResources().getString(R.string.setScaleValue));
+//                    ((TextView) ((Activity)context).findViewById(R.id.info_lbl)).setText(getResources().getString(R.string.setScaleValue));
                 }
             }
         }
@@ -84,7 +86,7 @@ public class DrawView extends SurfaceView {
      */
     public void clearCanvas(){
         circlePoints.clear();
-        ((TextView) ((Activity)context).findViewById(R.id.info_lbl)).setText(getResources().getString(R.string.setPicture));
+        //((TextView) ((Activity)context).findViewById(R.id.info_lbl)).setText(getResources().getString(R.string.setPicture));
         invalidate();
     }
 
@@ -97,7 +99,7 @@ public class DrawView extends SurfaceView {
      */
     public double calculate(double reference, int inputUnitIndex, int outputUnitIndex){
         if(circlePoints.size() != 4){
-            Toast.makeText(context, getResources().getString(R.string.error_noPoints), Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, getResources().getString(R.string.error_noPoints), Toast.LENGTH_SHORT).show();
             return -1;
         }
         return Ruler.compute(circlePoints, reference, inputUnitIndex, outputUnitIndex);

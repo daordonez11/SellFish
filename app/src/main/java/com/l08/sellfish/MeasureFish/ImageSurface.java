@@ -12,6 +12,7 @@ package com.l08.sellfish.MeasureFish;
         import android.graphics.Canvas;
         import android.graphics.Color;
         import android.graphics.Paint;
+        import android.graphics.PixelFormat;
         import android.view.SurfaceHolder;
         import android.view.SurfaceView;
 
@@ -27,9 +28,14 @@ public class ImageSurface extends SurfaceView implements SurfaceHolder.Callback 
     public ImageSurface(Context context, File image) {
         super(context);
         getHolder().addCallback(this);
+        getHolder().setFormat(PixelFormat.TRANSLUCENT);
+
         String imageFile = image.getAbsolutePath();
         icon = BitmapFactory.decodeFile(imageFile);
         paint = new Paint();
+        paint.setColor(Color.WHITE);
+        paint.setAlpha(255);
+        //setZOrderOnTop(true);
     }
 
     @Override
@@ -37,7 +43,7 @@ public class ImageSurface extends SurfaceView implements SurfaceHolder.Callback 
         super.onDraw(canvas);
         int newWidth = canvas.getHeight() * icon.getWidth() / icon.getHeight();
         icon = Bitmap.createScaledBitmap(icon, newWidth, canvas.getHeight(), false);
-        canvas.drawColor(Color.BLACK);
+       canvas.drawColor(Color.WHITE);
         int cx = (canvas.getWidth() - icon.getWidth()) / 2;
         int cy = (canvas.getHeight() - icon.getHeight()) / 2;
         canvas.drawBitmap(icon, cx, cy, paint);

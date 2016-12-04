@@ -72,6 +72,7 @@ public class PoblacionRecyclerViewAdapter extends RecyclerView.Adapter<Poblacion
                 }
             }
         });
+
     }
 
     @Override
@@ -95,6 +96,7 @@ public class PoblacionRecyclerViewAdapter extends RecyclerView.Adapter<Poblacion
             mTamano=(TextView)view.findViewById(R.id.etTamano);
             mEstanque=(TextView)view.findViewById(R.id.estanque);
             mPeriodicidad=(TextView)view.findViewById(R.id.periodicidad);
+
         }
 
         @Override

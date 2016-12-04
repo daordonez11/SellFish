@@ -5,11 +5,12 @@ package com.l08.sellfish.Models;
  */
 
 public class PezCloud {
-    public long id;
+    public String id;
     public double longitud;
     public String urlImagen;
     public int semana;
     public double peso;
+    public String grabacion;
     public PezCloud(){
     }
 }

@@ -5,7 +5,7 @@ package com.l08.sellfish.Models;
  */
 public class Poblacion {
 
-    public long id;
+    public String id;
     public String especie;
     public int tamaño;
     public String estanque;

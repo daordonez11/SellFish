@@ -7,11 +7,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
@@ -20,7 +22,17 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.l08.sellfish.Activities.MuestrasActivity;
+import com.l08.sellfish.Activities.PezRecyclerViewAdapter;
 import com.l08.sellfish.Models.Pez;
+import com.l08.sellfish.Models.PezCloud;
 import com.l08.sellfish.Models.Poblacion;
 import com.l08.sellfish.Persistance.PoblacionDatabaseHelper;
 import com.l08.sellfish.R;
@@ -116,12 +128,40 @@ private LineData lineData;
     private void loadEstimado() {
          lineData = new LineData();
         contador=0;
-        List<Poblacion> poblaciones = pdh.getAllPopulations();
-        totalPob=poblaciones.size();
-        for (int i=0;i<poblaciones.size();i++)
-        {
-            tasaCrecimiento(poblaciones.get(i).id);
-        }
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference myRef = database.getReference(user.getUid()+"/poblaciones");
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                Log.e("Count " ,""+snapshot.getChildrenCount());
+                List<Poblacion> list = new ArrayList<Poblacion>();
+                for (DataSnapshot postSnapshot: snapshot.getChildren()) {
+                    Poblacion pob = postSnapshot.getValue(Poblacion.class);
+                    Log.e("Get Data", pob.estanque);
+                    list.add(pob);
+                }
+                if(list.size()>0)
+                {
+                    totalPob=list.size();
+                    for (int i=0;i<list.size();i++)
+                    {
+                        System.out.println("Va a mostrar la población: "+list.get(i).id);
+                        tasaCrecimiento(list.get(i).id);
+                    }
+                }
+                else{
+                    Toast t = Toast.makeText(getActivity(), "La lista de poblaciones se encuentra vacia", Toast.LENGTH_SHORT);
+                    t.show();
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError firebaseError) {
+                Log.e("The read failed: " ,firebaseError.getMessage());
+
+            }
+        });
         //Cargo un listado de entradas
 //        List<Entry> entries = new ArrayList<Entry>();
 //        entries.add(new Entry(0, 0));
@@ -193,73 +233,115 @@ private LineData lineData;
 //Ecuación de crecimiento por Von Bertalanffy
 //Estimación de parámetros de crecimiento Ford-Waldford
 
-    public void tasaCrecimiento(long poblacionId) {
+    public void tasaCrecimiento(final String poblacionId) {
 
-        // creating regression object, passing true to have intercept term
-        SimpleRegression simpleRegression = new SimpleRegression(true);
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference myRef = database.getReference(user.getUid()+"/poblaciones/"+poblacionId+"/peces");
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                Log.e("Count " ,""+snapshot.getChildrenCount());
+                //Cargo un listado de entradas
 
-        // passing data to the model
-        // model will be fitted automatically by the class
-        List<Pez> tam = pdh.getFishesFromPopulation(poblacionId);
-//        //Cargo un listado de entradas
-      List<Entry> entries = new ArrayList<Entry>();
-        for (int i=0;i< tam.size()-1;i++)
-        {
-            entries.add(new Entry((float)tam.get(i).semana,(float)tam.get(i).longitud));
-            simpleRegression.addData(tam.get(i).longitud,tam.get(i+1).longitud);
-        }
-        if(tam.size()>0) {
-            entries.add(new Entry((float) tam.get(tam.size() - 1).semana, (float) tam.get(tam.size() - 1).longitud));
-        }
-        //Cargo en un data set
-        LineDataSet dataSet = new LineDataSet(entries, "Población "+poblacionId);
-        Random rnd = new Random();
-        int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
-        dataSet.setColor(color);
-        lineData.addDataSet(dataSet);
-        double b = simpleRegression.getSlope();
-        double a = simpleRegression.getIntercept();
-System.out.println("Mira el A: "+a+", Mira el B: "+b);
-        double k=-1*Math.log(b)/52;
-        double lInf=a/(1-b);
-            double t0 = 1 + (1 / k) + Math.log((lInf - tam.get(0).longitud) / lInf);
-            System.out.println("Población " + poblacionId + ", K = " + k + ", L(Inf) = " + lInf + ", T0 = " + t0);
-            total += "Población " + poblacionId + ", K = " + k + ", L(Inf) = " + lInf + "\n";
-
-
-        double promedio = 0;
-        for (int i=0;i< tam.size();i++)
-        {
-            if(tam.get(i).peso==0)
-            {
-                tam.get(i).peso=lInf*Math.pow(1-Math.exp(-1*k*(tam.get(i).semana-t0)),3);
-                pdh.updatePesoPez(tam.get(i));
-                System.out.println("MIRA EL PESOOOO:"+(lInf*Math.pow(1-Math.exp(-1*k*(tam.get(i).semana-t0)),3)));
-            }
-        }
-
-
-         List <Pez> predict = new ArrayList<>();
-        for(int i=1;i <9;i++)
-        {
-            Pez nuevo = new Pez();
-            nuevo.longitud=lInf*(1-Math.exp(-1*k*(i-t0)));
-            nuevo.semana=i;
-            predict.add(nuevo);
-
-        }
-        contador++;
-                if(contador==totalPob)
-                {
-
-                    lcEstimado.setData(lineData);
-                    lcEstimado.notifyDataSetChanged();
-                    lcEstimado.getLegend().setWordWrapEnabled(true);
-                    lcEstimado.getLegend().setEnabled(true);
-                    lcEstimado.getLegend().setPosition(Legend.LegendPosition.LEFT_OF_CHART_CENTER) ;
-                    lcEstimado.invalidate();
-                    tvEstimate.setText(total);
+                List<PezCloud> tam = new ArrayList<PezCloud>();
+                for (DataSnapshot postSnapshot: snapshot.getChildren()) {
+                    PezCloud pob = postSnapshot.getValue(PezCloud.class);
+                    Log.e("Get Data", pob.urlImagen);
+                    tam.add(pob);
                 }
+                if(tam.size()==0) {
+                    System.out.println( "La lista de de peces se encuentra vacia para la población: "+poblacionId);
+                    contador++;
+                    if(contador==totalPob)
+                    {
+
+                        lcEstimado.setData(lineData);
+                        lcEstimado.notifyDataSetChanged();
+                        lcEstimado.getLegend().setWordWrapEnabled(true);
+                        lcEstimado.getLegend().setEnabled(true);
+                        lcEstimado.getLegend().setPosition(Legend.LegendPosition.LEFT_OF_CHART_CENTER) ;
+                        lcEstimado.invalidate();
+                        tvEstimate.setText(total);
+                    }
+                    //Toast t = Toast.makeText(getActivity(), "La lista de de peces se encuentra vacia para la población: "+poblacionId, Toast.LENGTH_SHORT);
+                    //t.show();
+                }else{
+
+
+                    // creating regression object, passing true to have intercept term
+                    SimpleRegression simpleRegression = new SimpleRegression(true);
+
+                    // passing data to the model
+                    // model will be fitted automatically by the class
+                    List<Entry> entries = new ArrayList<Entry>();
+                    for (int i=0;i< tam.size()-1;i++)
+                    {
+                        entries.add(new Entry((float)tam.get(i).semana,(float)tam.get(i).longitud));
+                        simpleRegression.addData(tam.get(i).longitud,tam.get(i+1).longitud);
+                    }
+                    if(tam.size()>0) {
+                        entries.add(new Entry((float) tam.get(tam.size() - 1).semana, (float) tam.get(tam.size() - 1).longitud));
+                    }
+                    //Cargo en un data set
+                    LineDataSet dataSet = new LineDataSet(entries, "Población "+poblacionId);
+                    Random rnd = new Random();
+                    int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
+                    dataSet.setColor(color);
+                    lineData.addDataSet(dataSet);
+                    double b = simpleRegression.getSlope();
+                    double a = simpleRegression.getIntercept();
+                    System.out.println("Mira el A: "+a+", Mira el B: "+b);
+                    double k=(-1)*(Math.log(b)/52);
+                    double lInf=a/(1-b);
+                    double t0 = 1 + (1 / k) + Math.log((lInf - tam.get(0).longitud) / lInf);
+                    System.out.println("Población " + poblacionId + ", K = " + k + ", L(Inf) = " + lInf + ", T0 = " + t0);
+                    total += "\nPoblación " + poblacionId + "\n K = " + k + "\n L(Inf) = " + lInf + "\n";
+
+
+                    double promedio = 0;
+                    for (int i=0;i< tam.size();i++)
+                    {
+                        if(tam.get(i).peso==0)
+                        {
+                            tam.get(i).peso=lInf*Math.pow(1-Math.exp(-1*k*(tam.get(i).semana-t0)),3);
+                            pdh.updatePesoPez(tam.get(i));
+                          //  System.out.println("MIRA EL PESOOOO:"+(lInf*Math.pow(1-Math.exp(-1*k*(tam.get(i).semana-t0)),3)));
+                        }
+                    }
+
+
+                    List <Pez> predict = new ArrayList<>();
+                    for(int i=1;i <9;i++)
+                    {
+                        Pez nuevo = new Pez();
+                        nuevo.longitud=lInf*(1-Math.exp(-1*k*(i-t0)));
+                        nuevo.semana=i;
+                        predict.add(nuevo);
+
+                    }
+                    contador++;
+                    if(contador==totalPob)
+                    {
+
+                        lcEstimado.setData(lineData);
+                        lcEstimado.notifyDataSetChanged();
+                        lcEstimado.getLegend().setWordWrapEnabled(true);
+                        lcEstimado.getLegend().setEnabled(true);
+                        lcEstimado.getLegend().setPosition(Legend.LegendPosition.PIECHART_CENTER) ;
+                        lcEstimado.invalidate();
+                        tvEstimate.setText(total);
+                    }
+
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError firebaseError) {
+                Log.e("The read failed: " ,firebaseError.getMessage());
+
+            }
+        });
+
 
     }
 }
